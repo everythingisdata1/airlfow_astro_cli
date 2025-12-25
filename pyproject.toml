@@ -1,0 +1,9 @@
+[project]
+name = "airflow-pipeline"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "apache-airflow>=3.1.5",
+    "minio>=7.2.20",
+]

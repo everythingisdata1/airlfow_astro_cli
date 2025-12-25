@@ -1,12 +1,10 @@
-from airflow.decorators import dag, task
-from airflow.hooks.base import BaseHook
-from airflow.sensors.base import PokeReturnValue
-from airflow.operators.python import PythonOperator
-from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime
-import requests   # ✅ REQUIRED
 
-from include.stock_market.tasks import _get_stock_prices
+import requests
+from airflow.providers.standard.operators.python import PythonOperator
+from airflow.sdk import dag, task, PokeReturnValue
+
+from include.stock_market.tasks import _get_stock_prices, _process_stock_data
 
 SYMBOL = "NVDA"
 
@@ -42,11 +40,11 @@ def stock_market():
 
     store_prices = PythonOperator(
         task_id="store_stock_prices",
-        python_callable=lambda data: print(f"Storing stock price data: {data}"),
-        op_kwargs={"data": '{{ ti.xcom_pull(task_ids="get_stock_prices") }}'}
+        python_callable=_process_stock_data,
+        op_kwargs={"stock_prices": '{{ ti.xcom_pull(task_ids="get_stock_prices") }}'}
     )
 
-    is_api_available() >> get_stock_price
+    is_api_available() >> get_stock_price >> store_prices
 
 
 stock_market()

@@ -1,13 +1,10 @@
-from airflow.hooks.base import BaseHook
 import json
+
+import requests
 from minio import Minio
-from io import BytesIO
 
 
 def _get_stock_prices(url, symbol):
-    import json
-
-    import requests
     print("Getting stock price data...")
     headers = {
         "Accept": "application/json",
@@ -18,16 +15,16 @@ def _get_stock_prices(url, symbol):
     return json.dumps(resp.json()['chart']['result'][0])
 
 
-def _process_stock_data(data):
+def _process_stock_data(stock_prices):
     print("Processing stock price data...")
-    miniio_conn = Minio(
-        endpoint="minio:9000",
+    client = Minio(
+        "minio:9000",
         access_key="minioadmin",
-        secret_key="minioadmin", )
-    stock_data = json.loads(data)
-    # Example processing: Extract closing prices
-    timestamps = stock_data['timestamp']
-    indicators = stock_data['indicators']['quote'][0]
-    closing_prices = indicators['close']
-    processed_data = list(zip(timestamps, closing_prices))
-    return processed_data
+        secret_key="minioadmin",
+        secure=False
+    )
+    bucket_name = "stock-data"
+    if not client.bucket_exists(bucket_name):
+        client.make_bucket(bucket_name)
+    print(f"Storing stock price data in bucket '{bucket_name}'...")
+    print(f"Data: {stock_prices}")

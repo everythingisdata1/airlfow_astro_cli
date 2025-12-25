@@ -1,10 +1,14 @@
 services:
 
-  webserver:
+  api-server:
     networks:
       - ndsnet
 
   scheduler:
+    networks:
+      - ndsnet
+
+  dag-processor:
     networks:
       - ndsnet
 
@@ -33,7 +37,6 @@ services:
       retries: 3
     networks:
       - ndsnet
-  
   spark-master:
     image: airflow/spark-master
     build: ./spark/master
@@ -68,7 +71,6 @@ services:
       - ./include/data/metabase:/metabase-data
     networks:
       - ndsnet
-
   docker-proxy:
     image: alpine/socat
     command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"

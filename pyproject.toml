@@ -1,0 +1,12 @@
+[project]
+name = "airflow-spark"
+version = "0.1.0"
+description = "This project is for integrating Apache Airflow with Apache Spark."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "apache-airflow>=3.1.5",
+    "apache-airflow-providers-docker>=4.5.1",
+    "minio>=7.2.20",
+    "requests>=2.32.5",
+]
